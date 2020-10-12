@@ -1,0 +1,12 @@
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(13, OUTPUT);        // en esta parte se configura el pin 13 como salida del arduino.
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  digitalWrite(13, HIGH);   // En esta parte se configura el pin 13 en estado encendido o alto 5 Voltios.
+  delay(500);               // En esta parte se programa una duracion de 500 milisegundos de duración.
+  digitalWrite(13, LOW);    // En esta parte se configura el pin 13 en estado apagado 0 Voltios.
+  delay(1000);              // En esta parte se programa un duracion de 1 segundo o 1000 milisegundos de duración.
+}
