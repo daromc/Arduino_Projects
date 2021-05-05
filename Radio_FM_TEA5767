@@ -1,0 +1,75 @@
+// TEA5767 - Dario radio FM receptor
+#include <Wire.h>                                                   //  Librerias, Wire para el I2C
+#include <TEA5767N.h>                                               //  Libreria del radio TEA5767N                                         
+#include <Adafruit_GFX.h>                                           //  Librerias de la pantalla oled
+#include <Adafruit_SSD1306.h>                                       
+#include <splash.h>                                                 
+
+#define ANCHO 128                                                   // ancho y alto de la pantalla oled
+#define ALTO 64
+#define OLED_RESET 4                                                // prerequisito para crear el objeto oled
+
+Adafruit_SSD1306 oled(ANCHO, ALTO, &Wire, OLED_RESET);              // creacion del objeto oled
+TEA5767N Radio = TEA5767N();                                        // creacion del objeto Radio libreria TEA5767N
+
+double station = 97.9;                                              // variable en donde se almacena la estacion de inicio
+
+void setup()
+{ 
+  Wire.begin();                                                     // inicia el I2C
+  Serial.begin(9600);                                               // inicia el puerto serial
+  oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);                           // inicia el objeto de la pantalla oled
+  
+  pinMode(2, INPUT);                                                // pines de entrada numero 2 y 3, utilizadas para mover el dial a  + y - 0.1 Mhz 
+  pinMode(3, INPUT);
+    
+  Radio.selectFrequency(station);                                   // seleciona la frecuencia de incio FM 97.9 Mhz.
+  
+  Serial.println("Dario FM radio: ");                               // imprime mensaje de incio en el puerto serial
+  Serial.print("FM : ");
+  Serial.print(station);
+  Serial.println(" Mhz.");
+  delay(500);                                                      // espera 1 segundo.
+}
+
+void loop()
+{
+  if(digitalRead(2)== LOW) {                                        // si el pin 2 esta apretado aumenta en + 0.1 Mhz el dial del radio.
+      station = station + 0.1;
+      Radio.selectFrequency(station);                               // cambia de frecuencia.
+  }
+
+  if(digitalRead(3)== LOW) {                                        // si el pin 3 esta apretado disminuye en - 0.1 Mhz el dial del radio.
+      station = station - 0.1;
+      Radio.selectFrequency(station);                               // cambia de frecuencia.
+  }
+  
+  oled.clearDisplay();                                              // limpia la pantalla oled.
+  oled.setTextColor(WHITE);                                         // se configura el color blanco para la pantalla oled
+  oled.setCursor(0, 0);                                             // se configura el cursor en la posicion vertical = 0, horizontal =0
+  oled.setTextSize(1);                                              // tamañao del cursor en 1
+  oled.print("Bienvenido Dario FM !");                              // imprime mensaje de bienvenida en la pantalla oled
+  oled.setCursor(0, 10);                                            // se configura el cursor en la posicion horizontal = 0, vertical = 10
+  oled.print("Estacion = ");                                        // se imprime el mensaje "Estacion = " en la pantalla oled
+  oled.setCursor(70, 10);                                           // se configura el cursor en la posicion horizontal = 70, vertical = 10
+  oled.print(station);                                              // se imprime el numero de la estacion 
+
+  oled.setCursor(0, 20);                                            // se configura el cursor en la posicion horizontal = 0, vertical = 20
+  oled.print("Nivel = ");                                           // se imprime el mensaje "Nivel = " en la pantalla oled
+  oled.setCursor(70, 20);                                           // se configura el cursor en la posicion horizontal = 70, vertical = 20
+  oled.print(Radio.getSignalLevel());                               // se imprime el nivel de la señal.
+  oled.display();
+
+  Serial.print("station : ");                                       // se hace lo mismo pero en el puerto serial 
+  Serial.print(station);
+  Serial.println("");
+  Serial.print("FM : ");
+  Serial.print(Radio.readFrequencyInMHz());
+  Serial.print(" Mhz. ");
+  Serial.print(Radio.isStereo() ? " STEREO " : " MONO ");
+  Serial.print(" Nivel :  ");
+  Serial.print(Radio.getSignalLevel());
+  Serial.print("/15 ");
+  Serial.println("");
+  delay(100);
+}
