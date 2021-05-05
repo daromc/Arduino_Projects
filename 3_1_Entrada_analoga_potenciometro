@@ -1,0 +1,17 @@
+int LED = 3;
+int BRILLO;
+int potenciometro =0;
+
+//las entradas analogicas no requieren inicializacion
+
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(LED, OUTPUT);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  BRILLO = analogRead(potenciometro) / 4;  // se divide por 4 porque la entrada analoga da valores de 0-1023
+  analogWrite(LED, BRILLO);
+  
+}
